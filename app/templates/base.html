@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Приглашение{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Marck+Script&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      color: #5c3d44;
+      background: #fbeef1;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: #c96b84; text-decoration: none; }
+    a:hover { color: #b1516c; }
+
+    @keyframes petalFall {
+      0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.9; }
+      90%  { opacity: 0.9; }
+      100% { transform: translateY(110vh) translateX(40px) rotate(320deg); opacity: 0; }
+    }
+    @keyframes floatSoft {
+      0%,100% { transform: translateY(0); }
+      50%     { transform: translateY(-10px); }
+    }
+    @keyframes cardIn {
+      0%   { opacity: 0; transform: translateY(18px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes heartPulse {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.14); }
+    }
+
+    .page-wrap {
+      position: relative;
+      min-height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      background: radial-gradient(120% 90% at 50% 0%, #fff5f8 0%, #fbe6ec 45%, #f6d3de 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .petals {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .petal {
+      position: absolute;
+      top: 0;
+      opacity: 0;
+      animation: petalFall linear infinite;
+    }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 560px;
+      text-align: center;
+      animation: cardIn .7s ease both;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      font-size: clamp(34px, 8vw, 60px);
+      line-height: 1.08;
+      margin: 14px 0 6px;
+      color: #7a4a55;
+    }
+    .subtitle {
+      font-family: 'Marck Script', cursive;
+      font-size: clamp(26px, 6vw, 40px);
+      color: #c96b84;
+      margin-top: 8px;
+    }
+    .text {
+      font-size: clamp(15px, 3.6vw, 18px);
+      color: #9a6f78;
+      margin: 0 auto 40px;
+      max-width: 400px;
+    }
+    .phrase {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: clamp(24px, 6vw, 38px);
+      line-height: 1.25;
+      color: #7a4a55;
+      margin: 16px 0 28px;
+    }
+    .phrase-italic {
+      font-style: italic;
+    }
+
+    .btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      cursor: pointer;
+      border: none;
+      padding: 16px 42px;
+      border-radius: 999px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover { transform: translateY(-3px) scale(1.05); }
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #f48fb1, #e05c85);
+      box-shadow: 0 12px 26px rgba(224, 92, 133, .4);
+    }
+    .btn-primary:hover { box-shadow: 0 16px 32px rgba(224, 92, 133, .5); }
+    .btn-outline {
+      color: #b1516c;
+      background: #fff;
+      border: 1px solid #e7b9c6;
+      box-shadow: 0 6px 16px rgba(201, 107, 132, .18);
+    }
+
+    .icon-lg { font-size: 64px; }
+    .icon-md { font-size: 52px; }
+    .icon-sm { font-size: 48px; }
+    .pulse { animation: heartPulse 1.8s ease-in-out infinite; }
+    .float { animation: floatSoft 3s ease-in-out infinite; }
+
+    .panel {
+      background: #fff;
+      border-radius: 26px;
+      padding: 26px;
+      box-shadow: 0 16px 38px rgba(201, 107, 132, .2);
+      text-align: left;
+    }
+
+    .form-label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-weight: 600;
+      color: #8a5b64;
+      font-size: 14px;
+    }
+    .input {
+      border: 1.5px solid #f0cdd8;
+      border-radius: 14px;
+      padding: 13px 15px;
+      font-size: 16px;
+      color: #5c3d44;
+      outline: none;
+      font-family: 'Nunito', sans-serif;
+    }
+    .input:focus { border-color: #e05c85; }
+
+    .error {
+      color: #d64f6f;
+      background: #fde6ec;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+    .food-tile {
+      cursor: pointer;
+      border: 2px solid #f5dbe3;
+      background: #fff;
+      border-radius: 20px;
+      padding: 18px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
+      box-shadow: 0 4px 12px rgba(201, 107, 132, .1);
+      font-family: inherit;
+      width: 100%;
+    }
+    .food-tile:hover { transform: translateY(-3px); }
+    .food-tile.selected {
+      background: #fce0e8;
+      border-color: #e05c85;
+      box-shadow: 0 10px 22px rgba(224, 92, 133, .28);
+    }
+    .food-emoji { font-size: 34px; }
+    .food-name { font-weight: 700; font-size: 15px; color: #7a4a55; }
+
+    .summary-card {
+      background: #fff;
+      border-radius: 26px;
+      padding: 26px 22px;
+      box-shadow: 0 16px 38px rgba(201, 107, 132, .22);
+      display: inline-block;
+      text-align: left;
+      min-width: min(360px, 90%);
+    }
+    .summary-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed #f2ccd7;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label {
+      font-size: 12px;
+      color: #b58e97;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .summary-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #7a4a55;
+    }
+    .code-box {
+      margin-top: 18px;
+      background: #fff5f7;
+      border-radius: 16px;
+      padding: 14px 18px;
+      box-shadow: 0 6px 16px rgba(201, 107, 132, .15);
+      display: inline-block;
+      min-width: min(360px, 90%);
+    }
+    .code-value {
+      font-family: 'Nunito', monospace;
+      font-size: 22px;
+      font-weight: 800;
+      color: #b1516c;
+      letter-spacing: 2px;
+    }
+    .sign {
+      font-family: 'Marck Script', cursive;
+      color: #c96b84;
+      font-size: clamp(22px, 5vw, 30px);
+      margin-top: 26px;
+    }
+
+    {% block extra_css %}{% endblock %}
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="petals" aria-hidden="true">
+      {% for p in petals %}
+        <div class="petal" style="left: {{ p.left }}; font-size: {{ p.size }}; animation-duration: {{ p.dur }}; animation-delay: {{ p.delay }};">{{ p.glyph }}</div>
+      {% endfor %}
+    </div>
+    {% block content %}{% endblock %}
+  </div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Чего бы тебе хотелось?{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:640px;">
+  <div style="text-align:center;">
+    <div class="icon-sm">🍽️</div>
+    <h2 class="title" style="font-size:clamp(26px,6vw,40px); margin-bottom:6px;">Чего бы тебе хотелось?</h2>
+    <p class="text" style="margin-bottom:24px;">Выбери, что закажем&nbsp;💗</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('main.step4') }}" id="foodForm">
+    <input type="hidden" name="food_id" id="foodInput" value="{{ selected_food_id or '' }}">
+    <div class="food-grid">
+      {% for food in foods %}
+        <button type="button"
+                class="food-tile {% if selected_food_id == food.id %}selected{% endif %}"
+                data-id="{{ food.id }}">
+          <span class="food-emoji">{{ food.emoji }}</span>
+          <span class="food-name">{{ food.name }}</span>
+        </button>
+      {% endfor %}
+    </div>
+
+    <div style="text-align:center; margin-top:26px;">
+      <button type="submit" class="btn btn-primary" style="padding:15px 46px;">Далее →</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  const tiles = document.querySelectorAll('.food-tile');
+  const input = document.getElementById('foodInput');
+  const form = document.getElementById('foodForm');
+
+  tiles.forEach(function(tile) {
+    tile.addEventListener('click', function() {
+      tiles.forEach(function(t) { t.classList.remove('selected'); });
+      tile.classList.add('selected');
+      input.value = tile.getAttribute('data-id');
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    if (!input.value) {
+      e.preventDefault();
+      alert('Выбери, что хочешь заказать 💗');
+    }
+  });
+})();
+</script>
+{% endblock %}

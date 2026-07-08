@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Пойдёшь со мной на свидание?{% endblock %}
+
+{% block content %}
+<!-- Main invite screen -->
+<div id="inviteScreen" class="card">
+  <div class="icon-lg pulse" style="filter: drop-shadow(0 6px 14px rgba(201,107,132,.35));">💌</div>
+  <div class="subtitle">для Евы</div>
+  <h1 class="title">Пойдёшь со&nbsp;мной<br>на свидание?</h1>
+  <p class="text">Только один правильный ответ, и&nbsp;ты его знаешь&nbsp;😊</p>
+
+  <div id="btnArea" style="position:relative; height:180px; display:flex; align-items:center; justify-content:center; gap:22px;">
+    <a href="{{ url_for('main.step2') }}" class="btn btn-primary" style="padding:18px 46px; font-size:20px;">Да&nbsp;💕</a>
+
+    <button type="button" id="noBtn" class="btn btn-outline" style="padding:16px 38px; font-weight:600; font-size:18px; transition:transform .35s cubic-bezier(.22,1,.36,1); position:relative;">Нет</button>
+  </div>
+</div>
+
+<!-- Sad screen -->
+<div id="sadScreen" class="card" style="display:none; max-width:520px;">
+  <div class="icon-lg float">🥺</div>
+  <h1 class="title" style="font-size:clamp(30px,7vw,50px);">Ой… правда нет?</h1>
+  <p class="text">А я так готовился(лась)… разбитое сердечко где-то тихо плачет&nbsp;💔</p>
+  <div style="font-size:44px; margin-bottom:28px;">💔</div>
+  <button type="button" id="unSadBtn" class="btn btn-primary">Ну ладно, дай ещё шанс 🥰</button>
+  <div style="font-family:'Marck Script',cursive; color:#c96b84; font-size:20px; margin-top:22px;">(правильный ответ всё-таки «Да» 😊)</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  const noBtn = document.getElementById('noBtn');
+  const btnArea = document.getElementById('btnArea');
+  const inviteScreen = document.getElementById('inviteScreen');
+  const sadScreen = document.getElementById('sadScreen');
+  const unSadBtn = document.getElementById('unSadBtn');
+
+  let noDX = 0, noDY = 0, noMoves = 0;
+
+  function updateLabel() {
+    if (noMoves === 0) noBtn.textContent = 'Нет';
+    else if (noMoves < 8) noBtn.textContent = 'Нет 🏃';
+    else if (noMoves < 20) noBtn.textContent = 'не поймаешь';
+    else noBtn.textContent = 'сдавайся 😄';
+  }
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  // Desktop: run away from cursor
+  btnArea.addEventListener('mousemove', function(e) {
+    const r = noBtn.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const dx = cx - e.clientX;
+    const dy = cy - e.clientY;
+    const dist = Math.hypot(dx, dy) || 1;
+    const threshold = 120;
+    if (dist > threshold) return;
+    const maxX = 130, maxY = 72;
+    const push = (threshold - dist) * 0.5;
+    const nx = clamp(noDX + (dx / dist) * push, -maxX, maxX);
+    const ny = clamp(noDY + (dy / dist) * push, -maxY, maxY);
+    if (nx !== noDX || ny !== noDY) {
+      noDX = nx; noDY = ny; noMoves++;
+      noBtn.style.transform = 'translate(' + noDX + 'px,' + noDY + 'px)';
+      updateLabel();
+    }
+  });
+
+  function showSad() {
+    inviteScreen.style.display = 'none';
+    sadScreen.style.display = 'block';
+  }
+
+  // Mobile: jump to random spot in bounded zone
+  noBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    const maxX = 130, maxY = 72;
+    noDX = Math.round((Math.random() * 2 - 1) * maxX);
+    noDY = Math.round((Math.random() * 2 - 1) * maxY);
+    noMoves++;
+    noBtn.style.transform = 'translate(' + noDX + 'px,' + noDY + 'px)';
+    updateLabel();
+    showSad();
+  });
+
+  // No click -> sad screen
+  noBtn.addEventListener('click', function(e) {
+    if (e.cancelable) e.preventDefault();
+    showSad();
+  });
+
+  unSadBtn.addEventListener('click', function() {
+    sadScreen.style.display = 'none';
+    inviteScreen.style.display = 'block';
+    noDX = 0; noDY = 0; noMoves = 0;
+    noBtn.style.transform = 'translate(0,0)';
+    updateLabel();
+  });
+})();
+</script>
+{% endblock %}

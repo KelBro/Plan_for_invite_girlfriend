@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Когда и где встретимся?{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:480px;">
+  <div style="text-align:center;">
+    <div class="icon-sm">🗓️</div>
+    <h2 class="title" style="font-size:clamp(26px,6vw,40px); margin-bottom:24px;">Когда и где встретимся?</h2>
+  </div>
+
+  <form method="POST" action="{{ url_for('main.step3') }}" class="panel" style="display:flex; flex-direction:column; gap:16px;">
+    <label class="form-label">Дата
+      <input type="date" name="date" value="{{ date or '' }}" required class="input">
+    </label>
+    <label class="form-label">Время
+      <input type="time" name="time" value="{{ time or '' }}" required class="input">
+    </label>
+    <label class="form-label">Место
+      <input type="text" name="place" value="{{ place or '' }}" placeholder="Например: наша кофейня на углу" required class="input">
+    </label>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <button type="submit" class="btn btn-primary" style="margin-top:4px;">Далее →</button>
+  </form>
+</div>
+{% endblock %}

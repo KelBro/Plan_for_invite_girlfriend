@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Аудио для тебя{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:520px;">
+  <div class="icon-md float">🎧</div>
+  <h2 class="title" style="font-size:clamp(28px,6.5vw,44px);">Я записал(а) кое-что<br>для тебя</h2>
+  <p class="text" style="margin-bottom:32px;">Надень наушники и нажми на кнопку&nbsp;👇</p>
+
+  <div id="audioIntro">
+    <button type="button" id="revealBtn" class="btn btn-primary" style="padding:18px 44px; font-size:19px;">▶ Прослушать</button>
+  </div>
+
+  <div id="audioPlayer" style="display:none; animation:cardIn .5s ease both;">
+    <div style="background:#fff; border-radius:24px; padding:22px; box-shadow:0 14px 34px rgba(201,107,132,.22); max-width:400px; margin:0 auto;">
+      <audio controls src="{{ audio_url }}" style="width:100%;"></audio>
+      <div style="font-family:'Marck Script',cursive; color:#c96b84; font-size:18px; margin-top:10px;">с любовью 🎶</div>
+    </div>
+    <a href="{{ url_for('main.step3') }}" class="btn btn-primary" style="margin-top:26px;">Далее →</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  const revealBtn = document.getElementById('revealBtn');
+  const audioIntro = document.getElementById('audioIntro');
+  const audioPlayer = document.getElementById('audioPlayer');
+
+  revealBtn.addEventListener('click', function() {
+    audioIntro.style.display = 'none';
+    audioPlayer.style.display = 'block';
+  });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Всё решено{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:520px;">
+  <div class="icon-lg pulse">💞</div>
+  <p class="phrase phrase-italic">{{ final_phrase }}</p>
+
+  <div class="summary-card">
+    <div class="summary-row">
+      <span style="font-size:24px;">📅</span>
+      <div>
+        <div class="summary-label">Дата</div>
+        <div class="summary-value">{{ date_out }}</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <span style="font-size:24px;">⏰</span>
+      <div>
+        <div class="summary-label">Время</div>
+        <div class="summary-value">{{ time_out }}</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <span style="font-size:24px;">📍</span>
+      <div>
+        <div class="summary-label">Место</div>
+        <div class="summary-value">{{ place_out }}</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <span style="font-size:24px;">🍽️</span>
+      <div>
+        <div class="summary-label">Меню</div>
+        <div class="summary-value">{{ food_out }}</div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <span style="font-size:24px;">💭</span>
+      <div>
+        <div class="summary-label">Ответ</div>
+        <div class="summary-value">{{ answer_out }}</div>
+      </div>
+    </div>
+  </div>
+
+  {% if code %}
+    <div class="code-box">
+      <div style="font-size:12px; color:#b58e97; font-weight:600; text-transform:uppercase; letter-spacing:.05em;">Код для бота</div>
+      <div class="code-value">{{ code }}</div>
+    </div>
+  {% endif %}
+
+  <div class="sign">До встречи, Ева 💌</div>
+</div>
+{% endblock %}

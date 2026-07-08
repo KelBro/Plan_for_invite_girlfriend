@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Ты мне веришь?{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:520px;">
+  <div class="icon-sm">💭</div>
+  <p class="phrase">{{ phrase }}</p>
+
+  <form method="POST" action="{{ url_for('main.step6') }}" id="answerForm">
+    <input type="hidden" name="answer" id="answerInput" value="{% if answer6 is true %}yes{% elif answer6 is false %}no{% endif %}">
+
+    <div class="btn-row" style="margin-bottom:30px;">
+      <button type="button"
+              class="btn btn-outline ans-btn {% if answer6 is true %}selected{% endif %}"
+              data-value="yes"
+              style="padding:14px 34px;">Да 💗</button>
+      <button type="button"
+              class="btn btn-outline ans-btn {% if answer6 is false %}selected{% endif %}"
+              data-value="no"
+              style="padding:14px 34px;">Неа 🙈</button>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="padding:15px 46px;">Далее →</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .ans-btn.selected {
+    background: #fce0e8;
+    border-color: #e05c85;
+    color: #b1516c;
+  }
+</style>
+<script>
+(function() {
+  const buttons = document.querySelectorAll('.ans-btn');
+  const input = document.getElementById('answerInput');
+  const form = document.getElementById('answerForm');
+
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      buttons.forEach(function(b) { b.classList.remove('selected'); });
+      btn.classList.add('selected');
+      input.value = btn.getAttribute('data-value');
+    });
+  });
+
+  form.addEventListener('submit', function(e) {
+    if (!input.value) {
+      e.preventDefault();
+      alert('Выбери ответ 💭');
+    }
+  });
+})();
+</script>
+{% endblock %}

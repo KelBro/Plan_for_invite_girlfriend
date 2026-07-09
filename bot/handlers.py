@@ -1,78 +1,43 @@
-import logging
+from aiogram import Router, types
+from aiogram.filters import CommandStart
 
-import aiohttp
-from aiogram import Router, F
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
-
-from bot.config import DOMAIN
-from bot.keyboards import get_start_keyboard, remove_keyboard
-from bot.states import CodeStates
+from bot.config import ADMIN_CHAT_ID
+from bot.services import get_or_create_telegram_user, get_answers_summary, split_message
 
 router = Router()
-logger = logging.getLogger(__name__)
 
 
-@router.message(Command("start"))
-async def cmd_start(message: Message, state: FSMContext):
-    await state.clear()
-    await message.answer(
-        "💌 <b>Привет!</b>\n\n"
-        "Это бот для просмотра результатов приглашения на свидание.\n\n"
-        "Введи код, который ты получил, чтобы узнать все детали встречи 💕",
-        parse_mode="HTML",
-        reply_markup=get_start_keyboard()
+@router.message(CommandStart())
+async def cmd_start(message: types.Message):
+    telegram_id = message.from_user.id
+    username = message.from_user.username
+    first_name = message.from_user.first_name
+    last_name = message.from_user.last_name
+
+    user, created = get_or_create_telegram_user(
+        telegram_id=telegram_id,
+        username=username,
+        first_name=first_name,
+        last_name=last_name,
     )
 
+    name = first_name or username or "друг"
 
-@router.message(F.text == "🔑 Ввести код")
-async def ask_code(message: Message, state: FSMContext):
-    await state.set_state(CodeStates.waiting_for_code)
-    await message.answer(
-        "Введи код из 8 символов (буквы и цифры):",
-        reply_markup=remove_keyboard
-    )
-
-
-@router.message(CodeStates.waiting_for_code)
-async def process_code(message: Message, state: FSMContext, http_session: aiohttp.ClientSession):
-    code = message.text.strip().upper()
-
-    if len(code) != 8 or not code.isalnum():
-        await message.answer(
-            "❌ Неверный формат кода. Код состоит из 8 букв и цифр.\n"
-            "Попробуй ещё раз:"
-        )
+    # Если это администратор — отправляем все ответы из таблицы answers
+    if ADMIN_CHAT_ID and telegram_id == ADMIN_CHAT_ID:
+        summary = get_answers_summary()
+        for part in split_message(summary):
+            await message.answer(part)
         return
 
-    try:
-        async with http_session.post(
-            f"{DOMAIN}/api/check-code",
-            json={"code": code, "telegram_id": message.from_user.id},
-            timeout=aiohttp.ClientTimeout(total=10)
-        ) as resp:
-            data = await resp.json()
-
-        if resp.status == 200 and data.get("success"):
-            text = data.get("summary", "Данные не найдены.")
-            await message.answer(
-                f"✅ <b>Код принят!</b>\n\n{text}",
-                parse_mode="HTML"
-            )
-            await state.clear()
-            await message.answer(
-                "Чтобы проверить другой код, нажми /start",
-                reply_markup=get_start_keyboard()
-            )
-        else:
-            await message.answer(
-                f"❌ {data.get('message', 'Код не найден или уже использован.')}\n"
-                "Попробуй ещё раз или нажми /start"
-            )
-    except Exception:
-        logger.exception("Failed to check code via API")
+    if created:
         await message.answer(
-            "❌ Ошибка соединения с сервером. Попробуй позже.\n"
-            "Нажми /start чтобы начать заново."
+            f"Привет, {name}! 👋\n\n"
+            f"Я бот для приглашения на свидание. "
+            f"Ты сохранён(а) в базе под ID {telegram_id}."
+        )
+    else:
+        await message.answer(
+            f"С возвращением, {name}! 💫\n\n"
+            f"Ты уже есть в базе под ID {telegram_id}."
         )

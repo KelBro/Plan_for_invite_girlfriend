@@ -1,17 +1,16 @@
 import asyncio
-import logging
-import sys
 
-from dotenv import load_dotenv
+from app import create_app
+from bot.bot import create_bot, create_dispatcher
 
-load_dotenv()
 
-from bot.bot import main
+async def main():
+    app = create_app()
+    bot = create_bot()
+    dp = create_dispatcher(app)
+
+    await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\nBot stopped")
-        sys.exit(0)
+    asyncio.run(main())

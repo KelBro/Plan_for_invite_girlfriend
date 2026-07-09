@@ -13,12 +13,8 @@ from flask import (
 
 from app.extensions import db
 from app.models.food import Food
-from app.models.tg_code import TelegramCode
 from app.models.user import User
-from app.services.code_service import create_code_for_user
-from app.services.meeting_service import get_meeting_summary_by_user
 from app.services.session_service import get_user, save_user
-from app.services.telegram_service import send_message
 from app.services.user_service import create_user
 
 main_bp = Blueprint("main", __name__)
@@ -218,22 +214,8 @@ def step7():
         user.finished = True
         db.session.commit()
 
-    tc = TelegramCode.query.filter_by(user_id=user.id).first()
-    if not tc:
-        tc = create_code_for_user(user.id)
-
-    admin_id = current_app.config.get("ADMIN_CHAT_ID")
-    if admin_id:
-        try:
-            summary = get_meeting_summary_by_user(user) or "Данные не найдены"
-            text = (
-                f"✅ Девушка завершила приглашение!\n\n"
-                f"🔑 Код: <code>{tc.code}</code>\n\n"
-                f"{summary}"
-            )
-            send_message(admin_id, text, parse_mode="HTML")
-        except Exception:
-            current_app.logger.exception("Failed to notify admin")
+    # Финальный commit, чтобы гарантировать сохранение всех ответов
+    db.session.commit()
 
     return render_template(
         "step7.html",
@@ -244,5 +226,5 @@ def step7():
         place_out=answer.meeting_place or "—",
         food_out=f"{food.emoji} {food.name}" if food else "на твой вкус",
         answer_out="Да 💗" if answer.answer6 is True else "Неа 🙈",
-        code=tc.code,
+        code=None,
     )

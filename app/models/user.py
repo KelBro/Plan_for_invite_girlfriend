@@ -51,12 +51,5 @@ class User(db.Model):
         cascade="all, delete"
     )
 
-    telegram_codes = db.relationship(
-        "TelegramCode",
-        backref="user",
-        lazy="dynamic",
-        cascade="all, delete"
-    )
-
     def __repr__(self):
         return f"<User {self.uuid}>"

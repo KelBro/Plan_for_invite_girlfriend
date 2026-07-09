@@ -26,17 +26,15 @@ def me():
     if user is None:
         return jsonify({"success": False}), 401
     ans = user.answer
-    food = None
-    if ans and ans.food_id:
-        f = Food.query.get(ans.food_id)
-        if f:
-            food = {"id": f.id, "name": f.name, "emoji": f.emoji}
+    foods = []
+    if ans and ans.foods:
+        foods = [{"id": f.id, "name": f.name, "emoji": f.emoji} for f in ans.foods]
     return jsonify({
         "success": True,
         "date": ans.meeting_date.isoformat() if ans and ans.meeting_date else None,
         "time": ans.meeting_time.strftime("%H:%M") if ans and ans.meeting_time else None,
         "place": ans.meeting_place or "",
-        "food": food,
+        "foods": foods,
         "answer6": ans.answer6,
         "finished": user.finished,
     })
@@ -77,9 +75,22 @@ def choose_food():
     if user is None:
         return jsonify({"success": False}), 401
     data = request.json or {}
-    food_id = data.get("food_id")
+
+    food_ids = data.get("food_ids")
+    if food_ids is None:
+        food_id = data.get("food_id")
+        if food_id is not None:
+            food_ids = [food_id]
+
+    if not isinstance(food_ids, list) or not food_ids:
+        return jsonify({"success": False, "message": "food_id или food_ids обязательны"}), 400
+
+    valid_ids = [int(fid) for fid in food_ids if isinstance(fid, int) or str(fid).isdigit()]
+    if not valid_ids:
+        return jsonify({"success": False, "message": "Неверные ID блюд"}), 400
+
     answer = user.answer
-    answer.food_id = food_id
+    answer.foods = Food.query.filter(Food.id.in_(valid_ids)).all()
     db.session.commit()
     return jsonify({"success": True})
 

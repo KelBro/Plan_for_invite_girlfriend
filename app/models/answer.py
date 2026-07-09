@@ -3,6 +3,23 @@ from datetime import datetime
 from app.extensions import db
 
 
+answer_foods = db.Table(
+    "answer_foods",
+    db.Column(
+        "answer_id",
+        db.Integer,
+        db.ForeignKey("answers.id"),
+        primary_key=True,
+    ),
+    db.Column(
+        "food_id",
+        db.Integer,
+        db.ForeignKey("foods.id"),
+        primary_key=True,
+    ),
+)
+
+
 class Answer(db.Model):
 
     __tablename__ = "answers"
@@ -33,11 +50,6 @@ class Answer(db.Model):
         nullable=True
     )
 
-    food_id = db.Column(
-        db.Integer,
-        db.ForeignKey("foods.id")
-    )
-
     answer6 = db.Column(
         db.Boolean
     )
@@ -52,7 +64,8 @@ class Answer(db.Model):
         back_populates="answer"
     )
 
-    food = db.relationship(
+    foods = db.relationship(
         "Food",
+        secondary=answer_foods,
         back_populates="answers"
     )

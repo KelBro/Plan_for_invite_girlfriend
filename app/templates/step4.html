@@ -7,21 +7,27 @@
   <div style="text-align:center;">
     <div class="icon-sm">🍽️</div>
     <h2 class="title" style="font-size:clamp(26px,6vw,40px); margin-bottom:6px;">Чего бы тебе хотелось?</h2>
-    <p class="text" style="margin-bottom:24px;">Выбери, что закажем&nbsp;💗</p>
+    <p class="text" style="margin-bottom:24px;">Выбери одно или несколько блюд&nbsp;💗</p>
   </div>
 
   <form method="POST" action="{{ url_for('main.step4') }}" id="foodForm">
-    <input type="hidden" name="food_id" id="foodInput" value="{{ selected_food_id or '' }}">
     <div class="food-grid">
       {% for food in foods %}
-        <button type="button"
-                class="food-tile {% if selected_food_id == food.id %}selected{% endif %}"
-                data-id="{{ food.id }}">
+        <label class="food-tile {% if food.id in selected_food_ids %}selected{% endif %}">
+          <input type="checkbox"
+                 name="food_id"
+                 value="{{ food.id }}"
+                 {% if food.id in selected_food_ids %}checked{% endif %}
+                 style="position:absolute; opacity:0; pointer-events:none;">
           <span class="food-emoji">{{ food.emoji }}</span>
           <span class="food-name">{{ food.name }}</span>
-        </button>
+        </label>
       {% endfor %}
     </div>
+
+    {% if error %}
+      <div class="error" style="margin-top:16px;">{{ error }}</div>
+    {% endif %}
 
     <div style="text-align:center; margin-top:26px;">
       <button type="submit" class="btn btn-primary" style="padding:15px 46px;">Далее →</button>
@@ -33,22 +39,20 @@
 {% block scripts %}
 <script>
 (function() {
-  const tiles = document.querySelectorAll('.food-tile');
-  const input = document.getElementById('foodInput');
   const form = document.getElementById('foodForm');
+  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
 
-  tiles.forEach(function(tile) {
-    tile.addEventListener('click', function() {
-      tiles.forEach(function(t) { t.classList.remove('selected'); });
-      tile.classList.add('selected');
-      input.value = tile.getAttribute('data-id');
+  checkboxes.forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      checkbox.closest('.food-tile').classList.toggle('selected', checkbox.checked);
     });
   });
 
   form.addEventListener('submit', function(e) {
-    if (!input.value) {
+    const checked = form.querySelectorAll('input[name="food_id"]:checked');
+    if (checked.length === 0) {
       e.preventDefault();
-      alert('Выбери, что хочешь заказать 💗');
+      alert('Выбери хотя бы одно блюдо 💗');
     }
   });
 })();

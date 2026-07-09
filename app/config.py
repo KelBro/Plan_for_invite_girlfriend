@@ -23,8 +23,8 @@ class Config:
     DOMAIN = os.getenv("DOMAIN", "http://localhost:5000")
 
     PHRASE5 = os.getenv("PHRASE5") or (
-        "Кстати… ты даже не представляешь, как я рад(а), "
-        "что дочитала до этого места 🥰"
+        "Кстати… ты даже не представляешь, как я рад, "
+        "что ты дочитала до этого места 🥰"
     )
 
     PHRASE6 = os.getenv("PHRASE6") or (
@@ -32,5 +32,5 @@ class Config:
     )
 
     FINAL_PHRASE = os.getenv("FINAL_PHRASE") or (
-        "Значит, всё решено. Я тебя жду!"
+        "Значит, всё решено. Я тебя очень жду!"
     )

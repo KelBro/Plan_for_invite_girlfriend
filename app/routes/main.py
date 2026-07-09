@@ -142,10 +142,21 @@ def step4():
         return redirect(url_for("main.step3"))
 
     if request.method == "POST":
-        food_id = request.form.get("food_id", "").strip()
-        if food_id:
-            answer.food_id = int(food_id)
-            db.session.commit()
+        selected_ids = request.form.getlist("food_id")
+        valid_ids = [int(fid) for fid in selected_ids if fid.isdigit()]
+
+        if not valid_ids:
+            foods = Food.query.filter_by(active=True).order_by(Food.id).all()
+            return render_template(
+                "step4.html",
+                petals=_petals(),
+                foods=foods,
+                selected_food_ids=[f.id for f in answer.foods],
+                error="Выбери хотя бы одно блюдо 🍽️",
+            )
+
+        answer.foods = Food.query.filter(Food.id.in_(valid_ids)).all()
+        db.session.commit()
         return redirect(url_for("main.step5"))
 
     foods = Food.query.filter_by(active=True).order_by(Food.id).all()
@@ -153,7 +164,7 @@ def step4():
         "step4.html",
         petals=_petals(),
         foods=foods,
-        selected_food_id=answer.food_id,
+        selected_food_ids=[f.id for f in answer.foods],
     )
 
 
@@ -162,7 +173,7 @@ def step5():
     user = _ensure_user()
     answer = user.answer
 
-    if not answer.food_id:
+    if not answer.foods:
         return redirect(url_for("main.step4"))
 
     return render_template(
@@ -177,7 +188,7 @@ def step6():
     user = _ensure_user()
     answer = user.answer
 
-    if not answer.food_id:
+    if not answer.foods:
         return redirect(url_for("main.step4"))
 
     if request.method == "POST":
@@ -205,17 +216,17 @@ def step7():
     if answer.answer6 is None:
         return redirect(url_for("main.step6"))
 
-    if answer.food_id:
-        food = Food.query.get(answer.food_id)
-    else:
-        food = None
-
     if not user.finished:
         user.finished = True
         db.session.commit()
 
-    # Финальный commit, чтобы гарантировать сохранение всех ответов
     db.session.commit()
+
+    food_out = (
+        ", ".join(f"{f.emoji} {f.name}" for f in answer.foods)
+        if answer.foods
+        else "на твой вкус"
+    )
 
     return render_template(
         "step7.html",
@@ -224,7 +235,7 @@ def step7():
         date_out=_fmt_date(answer.meeting_date),
         time_out=answer.meeting_time.strftime("%H:%M") if answer.meeting_time else "—",
         place_out=answer.meeting_place or "—",
-        food_out=f"{food.emoji} {food.name}" if food else "на твой вкус",
+        food_out=food_out,
         answer_out="Да 💗" if answer.answer6 is True else "Неа 🙈",
         code=None,
     )

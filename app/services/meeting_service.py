@@ -1,5 +1,4 @@
 from app.models.user import User
-from app.models.food import Food
 
 
 def get_meeting_summary_by_user(user):
@@ -7,10 +6,8 @@ def get_meeting_summary_by_user(user):
         return None
     ans = user.answer
     food_name = "не выбрано"
-    if ans.food_id:
-        food = Food.query.get(ans.food_id)
-        if food:
-            food_name = f"{food.emoji} {food.name}"
+    if ans.foods:
+        food_name = ", ".join(f"{f.emoji} {f.name}" for f in ans.foods)
     date_str = ""
     if ans.meeting_date:
         date_str = ans.meeting_date.strftime("%d.%m.%Y") if hasattr(ans.meeting_date, "strftime") else str(ans.meeting_date)

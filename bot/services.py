@@ -1,6 +1,5 @@
 from app.extensions import db
 from app.models.answer import Answer
-from app.models.food import Food
 from app.models.user import User
 
 
@@ -47,10 +46,8 @@ def get_answers_summary():
         )
 
         food_name = "не выбрано"
-        if ans.food_id:
-            food = Food.query.get(ans.food_id)
-            if food:
-                food_name = f"{food.emoji} {food.name}"
+        if ans.foods:
+            food_name = ", ".join(f"{f.emoji} {f.name}" for f in ans.foods)
 
         date_str = (
             ans.meeting_date.strftime("%d.%m.%Y")

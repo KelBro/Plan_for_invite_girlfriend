@@ -1,4 +1,5 @@
 from app.extensions import db
+from app.models.answer import answer_foods
 
 
 class Food(db.Model):
@@ -32,7 +33,8 @@ class Food(db.Model):
 
     answers = db.relationship(
         "Answer",
-        back_populates="food"
+        secondary=answer_foods,
+        back_populates="foods"
     )
 
     def __repr__(self):

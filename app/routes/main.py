@@ -1,5 +1,4 @@
 import os
-import random
 from datetime import datetime
 
 from flask import (
@@ -35,10 +34,7 @@ def _petals():
 
 
 def _audio_url():
-    audio_dir = os.path.join(
-        current_app.static_folder or "app/static",
-        "audio"
-    )
+    audio_dir = os.path.join(current_app.static_folder or "app/static", "audio")
     if not os.path.isdir(audio_dir):
         return ""
     files = [
@@ -220,13 +216,7 @@ def step7():
         user.finished = True
         db.session.commit()
 
-    db.session.commit()
-
-    food_out = (
-        ", ".join(f"{f.emoji} {f.name}" for f in answer.foods)
-        if answer.foods
-        else "на твой вкус"
-    )
+    food_out = ", ".join(f"{f.emoji} {f.name}" for f in answer.foods) if answer.foods else "на твой вкус"
 
     return render_template(
         "step7.html",
@@ -237,5 +227,4 @@ def step7():
         place_out=answer.meeting_place or "—",
         food_out=food_out,
         answer_out="Да 💗" if answer.answer6 is True else "Неа 🙈",
-        code=None,
     )

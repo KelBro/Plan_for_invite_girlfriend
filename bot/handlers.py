@@ -23,7 +23,6 @@ async def cmd_start(message: types.Message):
 
     name = first_name or username or "друг"
 
-    # Если это администратор — отправляем все ответы из таблицы answers
     if ADMIN_CHAT_ID and telegram_id == ADMIN_CHAT_ID:
         summary = get_answers_summary()
         for part in split_message(summary):

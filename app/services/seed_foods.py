@@ -13,25 +13,14 @@ foods = [
     ("Мороженое", "🍨"),
     ("Кофе", "☕"),
     ("Блины", "🥞"),
-
 ]
 
 
 def seed():
-
     if Food.query.count():
-
         return
 
     for name, emoji in foods:
-
-        db.session.add(
-            Food(
-                name=name,
-                emoji=emoji
-            )
-        )
+        db.session.add(Food(name=name, emoji=emoji))
 
     db.session.commit()
-
-    print("Foods added.")

@@ -115,6 +115,3 @@ def finish():
     user.finished = True
     db.session.commit()
     return jsonify({"success": True})
-
-
-

@@ -3,7 +3,6 @@
 {% block title %}Пойдёшь со мной на свидание?{% endblock %}
 
 {% block content %}
-<!-- Main invite screen -->
 <div id="inviteScreen" class="card">
   <div class="icon-lg pulse" style="filter: drop-shadow(0 6px 14px rgba(201,107,132,.35));">💌</div>
   <div class="subtitle">для Евы</div>
@@ -17,7 +16,6 @@
   </div>
 </div>
 
-<!-- Sad screen -->
 <div id="sadScreen" class="card" style="display:none; max-width:520px;">
   <div class="icon-lg float">🥺</div>
   <h1 class="title" style="font-size:clamp(30px,7vw,50px);">Ой… правда нет?</h1>
@@ -48,7 +46,6 @@
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
-  // Desktop: run away from cursor
   btnArea.addEventListener('mousemove', function(e) {
     const r = noBtn.getBoundingClientRect();
     const cx = r.left + r.width / 2;
@@ -74,7 +71,6 @@
     sadScreen.style.display = 'block';
   }
 
-  // Mobile: jump to random spot in bounded zone
   noBtn.addEventListener('touchstart', function(e) {
     e.preventDefault();
     const maxX = 130, maxY = 72;
@@ -86,7 +82,6 @@
     showSad();
   });
 
-  // No click -> sad screen
   noBtn.addEventListener('click', function(e) {
     if (e.cancelable) e.preventDefault();
     showSad();

@@ -8,7 +8,6 @@ async def main():
     app = create_app()
     bot = create_bot()
     dp = create_dispatcher(app)
-
     await dp.start_polling(bot)
 
 

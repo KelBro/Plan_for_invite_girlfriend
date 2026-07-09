@@ -4,24 +4,19 @@ from app.models.user import User
 
 
 def get_or_create_telegram_user(telegram_id, username=None, first_name=None, last_name=None):
-    """
-    Ищет пользователя по telegram_id. Если не находит — создаёт новую запись
-    в таблице users.
-    """
     user = User.query.filter_by(telegram_id=telegram_id).first()
     if user:
         return user, False
 
-    display_name = " ".join(
-        part for part in [first_name, last_name] if part
-    ) or (f"@{username}" if username else "Telegram пользователь")
+    display_name = " ".join(part for part in [first_name, last_name] if part) or (
+        f"@{username}" if username else "Telegram пользователь"
+    )
 
     user = User(
         telegram_id=telegram_id,
         ip="telegram",
         user_agent=f"Telegram: {display_name}".strip(),
     )
-
     db.session.add(user)
     db.session.commit()
 
@@ -29,9 +24,6 @@ def get_or_create_telegram_user(telegram_id, username=None, first_name=None, las
 
 
 def get_answers_summary():
-    """
-    Возвращает отформатированный текст со всеми записями из таблицы answers.
-    """
     answers = Answer.query.order_by(Answer.created_at.desc()).all()
     if not answers:
         return "Пока никто не заполнил опрос."
@@ -39,33 +31,11 @@ def get_answers_summary():
     lines = [f"📋 Результаты опроса ({len(answers)} записей):\n"]
     for ans in answers:
         user = ans.user
-        user_label = (
-            f"tg:{user.telegram_id}"
-            if user.telegram_id
-            else f"uuid:{user.uuid[:8]}..."
-        )
-
-        food_name = "не выбрано"
-        if ans.foods:
-            food_name = ", ".join(f"{f.emoji} {f.name}" for f in ans.foods)
-
-        date_str = (
-            ans.meeting_date.strftime("%d.%m.%Y")
-            if ans.meeting_date
-            else "—"
-        )
-        time_str = (
-            ans.meeting_time.strftime("%H:%M")
-            if ans.meeting_time
-            else "—"
-        )
-        answer6 = (
-            "Да 💗"
-            if ans.answer6 is True
-            else "Неа 🙈"
-            if ans.answer6 is False
-            else "—"
-        )
+        user_label = f"tg:{user.telegram_id}" if user.telegram_id else f"uuid:{user.uuid[:8]}..."
+        food_name = ", ".join(f"{f.emoji} {f.name}" for f in ans.foods) if ans.foods else "не выбрано"
+        date_str = ans.meeting_date.strftime("%d.%m.%Y") if ans.meeting_date else "—"
+        time_str = ans.meeting_time.strftime("%H:%M") if ans.meeting_time else "—"
+        answer6 = "Да 💗" if ans.answer6 is True else "Неа 🙈" if ans.answer6 is False else "—"
 
         lines.append(
             f"👤 Пользователь: {user_label}\n"
@@ -80,9 +50,6 @@ def get_answers_summary():
 
 
 def split_message(text, max_len=4000):
-    """
-    Разбивает длинное сообщение на части, чтобы не превысить лимит Telegram.
-    """
     if len(text) <= max_len:
         return [text]
 
@@ -102,4 +69,4 @@ def split_message(text, max_len=4000):
     if current:
         result.append(current)
 
-    return result if result else [text[:max_len]]
+    return result

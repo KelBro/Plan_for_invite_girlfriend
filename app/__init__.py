@@ -5,19 +5,13 @@ from app.extensions import db, migrate
 
 
 def create_app():
-    app = Flask(
-        __name__,
-        template_folder="templates",
-        static_folder="static"
-    )
-
+    app = Flask(__name__, template_folder="templates")
     app.config.from_object(Config)
 
     db.init_app(app)
     migrate.init_app(app, db)
 
     from app.models import User, Food, Answer
-
     from app.routes.main import main_bp
     from app.routes.api import api_bp
 
@@ -34,10 +28,6 @@ def create_app():
 
 
 def _migrate_food_to_many_to_many(app):
-    """
-    Одноразовая миграция: копирует старые значения food_id из таблицы answers
-    в новую связующую таблицу answer_foods.
-    """
     from sqlalchemy import inspect, text
 
     inspector = inspect(db.engine)
@@ -62,9 +52,7 @@ def _migrate_food_to_many_to_many(app):
 
     for answer_id, food_id in rows:
         db.session.execute(
-            text(
-                "INSERT INTO answer_foods (answer_id, food_id) VALUES (:answer_id, :food_id)"
-            ),
+            text("INSERT INTO answer_foods (answer_id, food_id) VALUES (:answer_id, :food_id)"),
             {"answer_id": answer_id, "food_id": food_id},
         )
 
